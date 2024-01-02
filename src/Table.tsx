@@ -160,6 +160,13 @@ export interface ProColumnType<T = unknown>
    * form 的排序
    */
   order?: number;
+
+  /**
+   * added by shenyin
+   * 2024-01-02
+   * 是否要使用 ProTable 自带的 onFilter
+   */
+  useProOnFilter?: boolean;
 }
 
 export interface ProColumnGroupType<RecordType> extends ProColumnType<RecordType> {
@@ -525,14 +532,14 @@ const genColumnList = <T, U = {}>(
       const columnKey = genColumnKey(key, dataIndex, columnsIndex);
       const config = columnKey ? map[columnKey] || { fixed: item.fixed } : { fixed: item.fixed };
       const tempColumns = {
-        onFilter: (value: string, record: T) => {
+        onFilter: item.useProOnFilter === true ? (value: string, record: T) => {
           let recordElement = get(record, item.dataIndex || '');
           if (typeof recordElement === 'number') {
             recordElement = recordElement.toString();
           }
           const itemValue = String(recordElement || '') as string;
           return String(itemValue) === String(value);
-        },
+        } : item.onFilter,
         index: columnsIndex,
         filters: parsingValueEnumToArray(item.valueEnum).filter(
           (valueItem) => valueItem && valueItem.value !== 'all',
